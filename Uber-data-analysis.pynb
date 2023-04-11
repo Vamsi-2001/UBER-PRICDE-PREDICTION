@@ -1,0 +1,603 @@
+
+# # UBER DATA ANALYSIS
+
+# In[ ]:
+
+
+import numpy as np
+import pandas as pd
+
+
+# In[ ]:
+
+
+
+
+
+# In[2]:
+
+
+uber=pd.read_csv(r"C:\Users\Dell\OneDrive\Documents\jupyter\ML project(INT247)\excel uber data analysis.csv")
+
+# Exploratory data analysis
+# In[3]:
+
+
+uber.head()
+
+
+# In[4]:
+
+
+uber.shape
+
+
+# In[5]:
+
+
+uber.info()
+
+
+# In[6]:
+
+
+uber.describe()
+
+
+# In[7]:
+
+
+uber.isnull().sum()
+
+
+# # Feature Engineering
+
+# In[8]:
+
+
+import matplotlib.pyplot as plt
+get_ipython().run_line_magic('matplotlib', 'inline')
+import seaborn as sns
+
+
+# In[9]:
+
+
+sns.lineplot(data=uber, x='price', y='name')
+
+
+# In[10]:
+
+
+sns.stripplot(data=uber, x='price', y='icon')
+
+
+# In[11]:
+
+
+sns.stripplot(data=uber, x='surge_multiplier', y='hour')
+
+
+# Converting Timestamp to Datetime value
+
+# In[12]:
+
+
+uber['timestamp'].head()
+
+
+# In[13]:
+
+
+from datetime import datetime
+timestamp1 = 1544952608
+timestamp2 = 1543284024
+timestamp3 = 1543818483
+timestamp4 = 1543594384
+timestamp5 = 1544728504
+dt_object1 = datetime.fromtimestamp(timestamp1)
+dt_object2 = datetime.fromtimestamp(timestamp2)
+dt_object3 = datetime.fromtimestamp(timestamp3)
+dt_object4 = datetime.fromtimestamp(timestamp4)
+dt_object5 = datetime.fromtimestamp(timestamp5)
+
+print("dt_object =", dt_object1)
+print("dt_object =", dt_object2)
+print("dt_object =", dt_object3)
+print("dt_object =", dt_object4)
+print("dt_object =", dt_object5)
+
+
+# # Bar plots
+
+# In[14]:
+
+
+uber['month'].value_counts().plot(kind='bar', figsize=(10,5), color='blue')
+
+
+# In[15]:
+
+
+uber['source'].value_counts().plot(kind='bar', figsize=(10,5), color='green')
+
+
+# In[16]:
+
+
+uber['name'].value_counts().plot(kind='bar', figsize=(10,5), color='orange')
+
+
+# 
+# # Label Encoding
+
+# In[17]:
+
+
+# Import label encoder 
+from sklearn import preprocessing 
+  
+# label_encoder object knows how to understand word labels. 
+label_encoder = preprocessing.LabelEncoder() 
+
+
+# In[18]:
+
+
+uber.dtypes
+
+
+# In[19]:
+
+
+uber['id']= label_encoder.fit_transform(uber['id']) 
+uber['datetime']= label_encoder.fit_transform(uber['datetime']) 
+uber['timezone']= label_encoder.fit_transform(uber['timezone'])
+uber['destination']= label_encoder.fit_transform(uber['destination']) 
+uber['product_id']= label_encoder.fit_transform(uber['product_id'])
+uber['short_summary']= label_encoder.fit_transform(uber['short_summary'])
+uber['long_summary']= label_encoder.fit_transform(uber['long_summary'])
+
+
+# In[20]:
+
+
+uber['name']= label_encoder.fit_transform(uber['name'])
+
+print("Class mapping of Name: ")
+for i, item in enumerate(label_encoder.classes_):
+    print(item, "-->", i)
+
+
+# In[21]:
+
+
+uber['source']= label_encoder.fit_transform(uber['source'])
+
+print("Class mapping of Source: ")
+for i, item in enumerate(label_encoder.classes_):
+    print(item, "-->", i)
+
+
+# In[22]:
+
+
+uber['icon']= label_encoder.fit_transform(uber['icon'])
+
+print("Class mapping of Icon: ")
+for i, item in enumerate(label_encoder.classes_):
+    print(item, "-->", i)
+
+
+# In[23]:
+
+
+uber.dtypes
+
+
+# In[24]:
+
+
+uber.head()
+
+
+# Filling NAN Values
+
+# In[25]:
+
+
+uber.isnull().sum()
+
+
+# In[26]:
+
+
+uber['price'].median()
+
+
+# In[27]:
+
+
+uber["price"].fillna(13.5, inplace = True) 
+
+
+# In[28]:
+
+
+uber.isnull().sum()
+
+
+# In[29]:
+
+
+uber['timestamp'].dtype
+
+
+# In[30]:
+
+
+uber['timestamp'] = uber['timestamp'].astype(int)
+
+
+# In[31]:
+
+
+uber['timestamp'].head()
+
+
+# In[32]:
+
+
+uber['price'].dtype
+
+
+# In[33]:
+
+
+uber['price'] = uber['price'].astype(int)
+
+
+# In[34]:
+
+
+uber['price'].head()
+
+
+# # ML model
+
+# In[35]:
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+
+# In[36]:
+
+
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+
+
+# In[37]:
+
+
+X = uber.drop('price', axis = 1)
+y = uber['price']
+
+
+# In[38]:
+
+
+X = uber.drop('cab_type', axis = 1)
+
+
+# In[39]:
+
+
+X.head()
+
+
+# In[40]:
+
+
+y.head()
+
+
+# In[41]:
+
+
+X.shape
+
+
+# In[42]:
+
+
+y.shape
+
+
+# In[43]:
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+
+# In[44]:
+
+
+X_train.shape
+
+
+# In[45]:
+
+
+X_test.shape
+
+
+# In[46]:
+
+
+y_train.shape
+
+
+# In[47]:
+
+
+y_test.shape
+
+
+# In[48]:
+
+
+#Creating model
+reg1 = LinearRegression()
+#Fitting training data
+reg1 = reg1.fit(X_train, y_train)
+
+
+# In[49]:
+
+
+reg1.score(X_train, y_train)
+
+
+# In[50]:
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 20,)
+
+
+# In[51]:
+
+
+X_train.shape
+
+
+# In[52]:
+
+
+#Creating model
+reg = LinearRegression()
+#Fitting training data
+reg = reg1.fit(X_train, y_train)
+#Y prediction
+Y_pred = reg.predict(X_test)
+
+
+# In[53]:
+
+
+reg1.score(X_train, y_train)
+
+
+# In[54]:
+
+
+from sklearn.feature_selection import RFE
+
+
+# Training accuracy in 40 features
+
+# In[55]:
+
+
+rfe = RFE(reg, 40, verbose=1)    #verbose = 1, which includes both progress bar and one line per epoch
+rfe = rfe.fit(X, y)
+
+
+# In[56]:
+
+
+rfe.support_
+
+
+# In[57]:
+
+
+XX = X[X.columns[rfe.support_]]
+
+
+# In[58]:
+
+
+XX.head()
+
+
+# 25 Columns After RFE
+
+# In[59]:
+
+
+XX.columns
+
+
+# In[60]:
+
+
+XX.shape
+
+
+# In[61]:
+
+
+XX.head()
+
+
+# Drop Useless Features
+
+# In[62]:
+
+
+features_drop = ['latitude', 'longitude', 'apparentTemperature',
+       'long_summary', 'precipIntensity', 'humidity', 'windGust',
+       'temperatureHigh', 'apparentTemperatureHigh', 'dewPoint','precipIntensityMax',
+       'temperatureMax', 'apparentTemperatureMax', 'distance', 'cloudCover', 'moonPhase', 'temperatureLow', 'apparentTemperatureLow',
+        'windBearing', 'visibility.1', 'temperatureMin', 'apparentTemperatureMin', 'short_summary', 'precipProbability',
+         'visibility', 'temperature', 'pressure', 'ozone', 'hour', 'timezone', 'day', 'price']
+
+
+# In[63]:
+
+
+new_uber = XX.drop(features_drop, axis=1)
+
+
+# In[64]:
+
+
+new_uber.head()
+
+
+# In[65]:
+
+
+# Using Skicit-learn to split data into training and testing sets
+from sklearn.model_selection import train_test_split
+# Split the data into training and testing sets
+xx_train, xx_test, yy_train, yy_test = train_test_split(new_uber, y, test_size = 0.2, random_state = 42)
+
+
+# In[66]:
+
+
+xx_train.shape
+
+
+# In[67]:
+
+
+xx_test.shape
+
+
+# In[68]:
+
+
+yy_train.shape
+
+
+# In[69]:
+
+
+yy_test.shape
+
+
+# Linear regression
+
+# In[70]:
+
+
+linear = LinearRegression()
+linear.fit(xx_train, yy_train)
+linear.score(xx_test, yy_test)
+
+
+# Decision tree
+
+# In[71]:
+
+
+decision = DecisionTreeRegressor(random_state = 0)  
+decision.fit(xx_train , yy_train) 
+decision.score(xx_test, yy_test)
+
+
+# In[72]:
+
+
+random = RandomForestRegressor(n_estimators = 100, random_state = 0) 
+random.fit(xx_train , yy_train)  
+random.score(xx_test, yy_test)
+
+
+# # Testing
+
+# In[73]:
+
+
+linear.coef_
+
+
+# In[74]:
+
+
+prediction = linear.predict(xx_test)
+prediction
+
+
+# In[75]:
+
+
+prediction=  prediction.astype(int)
+
+
+# In[76]:
+
+
+from sklearn import metrics
+print('MAE :'," ", metrics.mean_absolute_error(yy_test,prediction))
+print('MSE :'," ", metrics.mean_squared_error(yy_test,prediction))
+print('RMAE :'," ", np.sqrt(metrics.mean_squared_error(yy_test,prediction)))
+
+
+# # Price prediction function 
+
+# In[77]:
+
+
+new_uber.head()
+
+
+# In[297]:
+
+
+def predict_price(name,source,surge_multiplier,icon):    
+    loc_index = np.where(new_uber.columns==name)[0]
+
+    x = np.zeros(len(new_uber.columns))
+    x[0] = source
+    x[1] = surge_multiplier
+    x[2] = icon
+    if loc_index >= 0:
+        x[loc_index] = 1
+
+    return random.predict([x])[0]
+
+
+# In[298]:
+
+
+pre= random.predict(xx_test)
+
+
+# In[299]:
+
+
+predict_price(1 , 3, 2, 0)
+
+
+# In[ ]:
+
+
+
+
